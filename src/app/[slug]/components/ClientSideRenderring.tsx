@@ -2,40 +2,79 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-const primaryColor = "#f3f3f3";
-import RunEffect from "./effect";
+
 import jsonToFunction from "./jsToFnc";
-export default function ClientSideRenderring({ Element, data }) {
+const primaryColor = "#f3f3f3";
+type Obj = {
+    [key: string]: any;
+};
+type ClientSideRenderringProps = {
+    Element: Obj[];
+    data: object;
+    page: {
+        [key: string]: Obj[];
+    };
+};
+export default function ClientSideRenderring({ Element, data, page }: ClientSideRenderringProps) {
     const parentDiv = Element.filter((el) => el.parentIndex === undefined).sort(
         (a, b) => a.index - b.index
     );
-
-    // state management
-    const [stateValues, setStateValues] = useState({});
-
     const childDiv = Element.filter((el) => el.parentIndex).sort((a, b) => a.index - b.index);
+
+    // !state management
+    //? Create an object to hold all the state values
+    const initialState: Obj = {};
+    //? Populate the initialState object based on the data
+    page?.states.forEach((item: { name: string; value: any }) => {
+        initialState[item.name] = item.value;
+    });
+    //?  initialize state
+    const [states, setState] = useState(initialState);
+
+    //?  function to update state values
+    const setStateValue = (name: string, newValue: any) => {
+        setState((prevState: Obj) => ({
+            ...prevState,
+            [name]: newValue,
+        }));
+    };
+
+    // !functions to run on page load
+    page?.functions?.forEach((func: string) => {
+        const hookFn = jsonToFunction(func, "func");
+        hookFn();
+    });
+
+    //! hooks to run on page load
+    page?.hooks?.forEach((hook: { name: string; dependencies: Array; hook: string }) => {
+        if (hook.name === "useEffect") {
+            const dependencyArray: any[] = [];
+            hook.dependencies.forEach((dependency: string) => {
+                dependencyArray.push(states[dependency]);
+            });
+            useEffect(() => {
+                const hookFn = jsonToFunction(hook, "hook");
+                hookFn();
+            }, [dependencyArray]);
+        }
+    });
 
     return (
         <>
             {parentDiv.map((pd, i) => {
                 pd.state ? eval(`let ${pd.state} = ${pd.stateValue}`) : null;
 
-                const [yeasir, setYeasir] = useState(0);
                 // define parent tag
                 const ParentTag = pd.tag;
 
                 // define onCLick function
-                const myFunction = jsonToFunction(pd, "onclick");
+                // Function to execute the onClickFunction from JSON
+                const executeOnClickFunction = () => {
+                    const { onclick } = pd;
 
-                // define useEffect function
-                const effectFn = jsonToFunction(pd, "useEffect");
-                RunEffect(
-                    pd.shouldRunEffect,
-                    effectFn,
-                    pd?.effectDeps,
-                    { yeasir2: yeasir },
-                    { yeasir: yeasir }
-                );
+                    // Use eval to execute the function string
+                    eval(`(${onclick})()`);
+                };
 
                 return pd.tag === "img" ? (
                     <img
@@ -44,8 +83,13 @@ export default function ClientSideRenderring({ Element, data }) {
                         style={pd.style}
                     />
                 ) : (
-                    <ParentTag key={i} style={pd.style} onClick={() => setYeasir(1)}>
-                        parent - {pd.index}
+                    <ParentTag
+                        key={i}
+                        style={pd.style}
+                        onClick={pd.onclick && executeOnClickFunction}
+                    >
+                        {/* parent - {pd.index} */}
+                        {pd.dataProperty && states[pd.dataProperty]}
                         {childDiv.map((cd, i) => {
                             // define child tag
 

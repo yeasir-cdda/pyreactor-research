@@ -26,7 +26,11 @@ const Page = async ({ params }: { params: { slug: string } }) => {
     console.log(data);
     return (
         <React.Fragment>
-            <ClientSideRenderring Element={filteredPage?.component} data={data} />
+            <ClientSideRenderring
+                Element={filteredPage?.component}
+                data={data}
+                page={filteredPage}
+            />
         </React.Fragment>
     );
 };

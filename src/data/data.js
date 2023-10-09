@@ -178,6 +178,34 @@ export const Pages = [
                 renderType: "csr",
             },
         ],
+        states: [
+            {
+                name: "yeasir",
+                value: "0",
+            },
+            {
+                name: "yeasir2",
+                value: 2,
+            },
+        ],
+        hooks: [
+            {
+                name: "useEffect",
+                dependencies: ["yeasir", "yeasir2"],
+                hook: `function(){
+                console.log("hey there yeasir from hook")
+            }`,
+            },
+        ],
+        functions: [
+            {
+                name: "setYeasir",
+                func: `function() { 
+                console.log(window.location.host)
+
+            }`,
+            },
+        ],
 
         component: [
             {
@@ -199,6 +227,8 @@ export const Pages = [
             {
                 index: 2,
                 tag: "p",
+                data: "",
+                content: "",
                 style: {
                     marginTop: "5px",
                     border: "4px solid",
@@ -214,7 +244,7 @@ export const Pages = [
                     marginBottom: "10px",
                 },
 
-                dataProperty: "title",
+                dataProperty: "yeasir2",
             },
             {
                 index: 3,
@@ -222,13 +252,13 @@ export const Pages = [
                 state: "yeasir",
                 stateValue: "0",
                 onclick: `function(){
-                    setYeasir(1)
+                    setStateValue("yeasir2", states["yeasir2"]-1)
                 }`,
-                shouldRunEffect: true,
-                useEffect: `function(){
-                    console.log("hello yeair")
-                }
-                `,
+                shouldRunEffect: false,
+                // useEffect: `function(){
+                //     console.log("hello yeair")
+                // }
+                // `,
                 effectDeps: ["yeasir"],
                 style: {
                     marginTop: "5px",
