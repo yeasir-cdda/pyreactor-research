@@ -12,7 +12,9 @@ type ClientSideRenderringProps = {
     Element: Obj[];
     data: object;
     page: {
-        [key: string]: Obj[];
+        [key: string]: Obj[{
+            [key: string]: any;
+        }];
     };
 };
 export default function ClientSideRenderring({ Element, data, page }: ClientSideRenderringProps) {
@@ -46,7 +48,7 @@ export default function ClientSideRenderring({ Element, data, page }: ClientSide
     });
 
     //! hooks to run on page load
-    page?.hooks?.forEach((hook: { name: string; dependencies: Array; hook: string }) => {
+    page?.hooks?.forEach((hook: { name: string; dependencies: Array<T>; hook: string }) => {
         if (hook.name === "useEffect") {
             const dependencyArray: any[] = [];
             hook.dependencies.forEach((dependency: string) => {
@@ -60,77 +62,193 @@ export default function ClientSideRenderring({ Element, data, page }: ClientSide
     });
 
     return (
-        <>
+        <div className="relative">
             {parentDiv.map((pd, i) => {
-                pd.state ? eval(`let ${pd.state} = ${pd.stateValue}`) : null;
-
                 // define parent tag
                 const ParentTag = pd.tag;
 
-                // define onCLick function
-                // Function to execute the onClickFunction from JSON
+                //! Function to execute the onClickFunction from JSON
                 const executeOnClickFunction = () => {
-                    const { onclick } = pd;
-
-                    // Use eval to execute the function string
-                    eval(`(${onclick})()`);
+                    const { onClick } = pd;
+                    eval(`(${onClick})()`);
                 };
+                let selectedStyle = {};
+                //!Conditional Styling
+                if (pd.conditionalStyles) {
+                    pd.conditionalStyles.forEach((conditionalStyle) => {
+                        if (eval(conditionalStyle.condition)) {
+                            console.log("condition true");
+                            selectedStyle = {
+                                ...selectedStyle,
+                                ...conditionalStyle.style,
+                            };
+                        }
+                    });
+                }
+                //! condition rendering
+                if (pd.conditionalRender) {
+                    let conditionMet = false;
 
-                return pd.tag === "img" ? (
-                    <img
-                        key={i}
-                        src="https://media.istockphoto.com/id/1419410282/photo/silent-forest-in-spring-with-beautiful-bright-sun-rays.jpg?s=2048x2048&w=is&k=20&c=t9_zg20wVbrBoGn0tw__1fFq4ykeKs15TQQ3x-ehVC0="
-                        style={pd.style}
-                    />
-                ) : (
-                    <ParentTag
-                        key={i}
-                        style={pd.style}
-                        onClick={pd.onclick && executeOnClickFunction}
-                    >
-                        {/* parent - {pd.index} */}
-                        {pd.dataProperty && states[pd.dataProperty]}
-                        {childDiv.map((cd, i) => {
-                            // define child tag
+                    pd.conditionalRender.forEach((condition) => {
+                        if (condition.operator === "OR") {
+                            conditionMet = conditionMet || eval(condition.expression);
+                        } else if (condition.operator === "AND") {
+                            conditionMet = conditionMet && eval(condition.expression);
+                        } else if (condition.operator === "NOT") {
+                            conditionMet = !conditionMet && eval(condition.expression);
+                        } else if (condition.operator === "NOR") {
+                            conditionMet = !conditionMet || eval(condition.expression);
+                        } else {
+                            conditionMet = eval(condition.expression);
+                        }
+                    });
+                    if (conditionMet) {
+                        return pd.tag === "img" ? (
+                            <img
+                                key={i}
+                                src="https://media.istockphoto.com/id/1419410282/photo/silent-forest-in-spring-with-beautiful-bright-sun-rays.jpg?s=2048x2048&w=is&k=20&c=t9_zg20wVbrBoGn0tw__1fFq4ykeKs15TQQ3x-ehVC0="
+                                style={{ ...pd.style, ...selectedStyle }}
+                            />
+                        ) : (
+                            <ParentTag
+                                key={i}
+                                style={{ ...pd.style, ...selectedStyle }}
+                                onClick={pd.onClick && executeOnClickFunction}
+                            >
+                                {/* parent - {pd.index} */}
+                                {pd.dataProperty && states[pd.dataProperty]}
+                                {childDiv.map((cd, i) => {
+                                    // define child tag
 
-                            const ChildTag = cd.tag;
-                            console.log(yeasir, ":");
+                                    const ChildTag = cd.tag;
 
-                            // dynamic import component and checking if component exists or not
+                                    let selectedStyleCd = {};
+                                    //!Conditional Styling
+                                    if (cd.conditionalStyles) {
+                                        cd.conditionalStyles.forEach((conditionalStyle) => {
+                                            if (eval(conditionalStyle.condition)) {
+                                                console.log("condition true children");
+                                                selectedStyleCd = {
+                                                    ...selectedStyleCd,
+                                                    ...conditionalStyle.style,
+                                                };
+                                            }
+                                        });
+                                    }
+                                    // dynamic import component and checking if component exists or not
 
-                            const ChildComponent = dynamic(
-                                () =>
-                                    import(`./${cd.component}.js`).catch(() => {
-                                        return {
-                                            default: <div>Hello world!</div>,
-                                        };
-                                    }),
-                                {
-                                    loading: () => <p className="p-4 text-center">Loading...</p>,
+                                    const ChildComponent = dynamic(
+                                        () =>
+                                            import(`./${cd.component}.js`).catch(() => {
+                                                return {
+                                                    default: <div>Hello world!</div>,
+                                                };
+                                            }),
+                                        {
+                                            loading: () => (
+                                                <p className="p-4 text-center">Loading...</p>
+                                            ),
 
-                                    suspense: cd.suspense,
+                                            suspense: cd.suspense,
 
-                                    ssr: false,
+                                            ssr: false,
+                                        }
+                                    );
+
+                                    if (cd.parentIndex === pd.index)
+                                        return (
+                                            <ChildTag
+                                                key={i}
+                                                style={{ ...cd.style, ...selectedStyleCd }}
+                                            >
+                                                {cd.component ? (
+                                                    <ChildComponent />
+                                                ) : (
+                                                    <span style={{}}>
+                                                        {/* Child of parent - {cd.parentIndex}, Child index -{" "}
+                                                        {cd.index} */}
+                                                    </span>
+                                                )}
+                                            </ChildTag>
+                                        );
+                                })}
+                            </ParentTag>
+                        );
+                    }
+                } else {
+                    return pd.tag === "img" ? (
+                        <img
+                            key={i}
+                            src="https://media.istockphoto.com/id/1419410282/photo/silent-forest-in-spring-with-beautiful-bright-sun-rays.jpg?s=2048x2048&w=is&k=20&c=t9_zg20wVbrBoGn0tw__1fFq4ykeKs15TQQ3x-ehVC0="
+                            style={{ ...pd.style, ...selectedStyle }}
+                        />
+                    ) : (
+                        <ParentTag
+                            key={i}
+                            style={{ ...pd.style, ...selectedStyle }}
+                            onClick={pd.onClick && executeOnClickFunction}
+                        >
+                            {/* parent - {pd.index} */}
+                            {pd.dataProperty && states[pd.dataProperty]}
+                            {childDiv.map((cd, i) => {
+                                // define child tag
+
+                                const ChildTag = cd.tag;
+
+                                let selectedStyleCd = {};
+                                //!Conditional Styling
+                                if (cd.conditionalStyles) {
+                                    cd.conditionalStyles.forEach((conditionalStyle) => {
+                                        if (eval(conditionalStyle.condition)) {
+                                            console.log("condition true");
+                                            selectedStyleCd = {
+                                                ...selectedStyleCd,
+                                                ...conditionalStyle.style,
+                                            };
+                                        }
+                                    });
                                 }
-                            );
+                                // dynamic import component and checking if component exists or not
 
-                            if (cd.parentIndex === pd.index)
-                                return (
-                                    <ChildTag key={i} style={cd.style}>
-                                        {cd.component ? (
-                                            <ChildComponent />
-                                        ) : (
-                                            <span>
-                                                Child of parent - {cd.parentIndex}, Child index -{" "}
-                                                {cd.index}
-                                            </span>
-                                        )}
-                                    </ChildTag>
+                                const ChildComponent = dynamic(
+                                    () =>
+                                        import(`./${cd.component}.js`).catch(() => {
+                                            return {
+                                                default: <div>Hello world!</div>,
+                                            };
+                                        }),
+                                    {
+                                        loading: () => (
+                                            <p className="p-4 text-center">Loading...</p>
+                                        ),
+
+                                        suspense: cd.suspense,
+
+                                        ssr: false,
+                                    }
                                 );
-                        })}
-                    </ParentTag>
-                );
+
+                                if (cd.parentIndex === pd.index)
+                                    return (
+                                        <ChildTag
+                                            key={i}
+                                            style={{ ...cd.style, ...selectedStyleCd }}
+                                        >
+                                            {cd.component ? (
+                                                <ChildComponent />
+                                            ) : (
+                                                <span style={{}}>
+                                                    {/* Child of parent - {cd.parentIndex}, Child index -{" "}
+                                                    {cd.index} */}
+                                                </span>
+                                            )}
+                                        </ChildTag>
+                                    );
+                            })}
+                        </ParentTag>
+                    );
+                }
             })}
-        </>
+        </div>
     );
 }

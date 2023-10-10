@@ -181,11 +181,15 @@ export const Pages = [
         states: [
             {
                 name: "yeasir",
-                value: "0",
+                value: 5,
             },
             {
                 name: "yeasir2",
                 value: 2,
+            },
+            {
+                name: "yeasir3",
+                value: 10,
             },
         ],
         hooks: [
@@ -248,18 +252,54 @@ export const Pages = [
             },
             {
                 index: 3,
+                tag: "p",
+                data: "",
+                content: "",
+                style: {
+                    marginTop: "5px",
+                    border: "4px solid",
+                    borderRadius: "10px",
+                    padding: "10px",
+                    borderColor: "blue",
+                    height: "100px",
+                    width: "50%",
+                    margin: "0 auto",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "10px",
+                },
+
+                dataProperty: "yeasir",
+            },
+            {
+                index: 7,
+                tag: "p",
+                data: "",
+                content: "",
+                style: {
+                    marginTop: "5px",
+                    border: "4px solid",
+                    borderRadius: "10px",
+                    padding: "10px",
+                    borderColor: "blue",
+                    height: "100px",
+                    width: "50%",
+                    margin: "0 auto",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "10px",
+                },
+
+                dataProperty: "yeasir3",
+            },
+            {
+                index: 4,
                 tag: "button",
-                state: "yeasir",
-                stateValue: "0",
-                onclick: `function(){
-                    setStateValue("yeasir2", states["yeasir2"]-1)
+                onClick: `function(){
+                    setStateValue("yeasir", states["yeasir"]+1)
                 }`,
-                shouldRunEffect: false,
-                // useEffect: `function(){
-                //     console.log("hello yeair")
-                // }
-                // `,
-                effectDeps: ["yeasir"],
                 style: {
                     marginTop: "5px",
                     border: "4px solid",
@@ -277,6 +317,127 @@ export const Pages = [
                 },
 
                 dataProperty: "button",
+            },
+            {
+                index: 6,
+                tag: "button",
+                onClick: `function(){
+                    setStateValue("yeasir", states["yeasir"]-1)
+                }`,
+                style: {
+                    marginTop: "5px",
+                    border: "4px solid",
+                    borderRadius: "10px",
+                    padding: "10px",
+                    borderColor: "purple",
+                    backgroundColor: "gray",
+                    height: "100px",
+                    width: "50%",
+                    margin: "0 auto",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "10px",
+                },
+
+                dataProperty: "button",
+            },
+            {
+                index: 8,
+                tag: "button",
+                onClick: `function(){
+                    setStateValue("yeasir3", states["yeasir3"]-1)
+                }`,
+                style: {
+                    marginTop: "5px",
+                    border: "4px solid",
+                    borderRadius: "10px",
+                    padding: "10px",
+                    borderColor: "purple",
+                    backgroundColor: "gray",
+                    height: "100px",
+                    width: "50%",
+                    margin: "0 auto",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "10px",
+                },
+
+                dataProperty: "button",
+            },
+            {
+                index: 5,
+                tag: "div",
+                style: {
+                    position: "absolute",
+                    bottom: "25px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "between",
+                    borderRadius: "10px",
+                    padding: "10px",
+                    backgroundColor: "#B2BEB5",
+                    height: "120px",
+                    width: "20%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "10px",
+                    transition: "all 0.5s ease-in-out",
+                },
+                conditionalStyles: [
+                    {
+                        condition: "states['yeasir'] < 4",
+                        style: {
+                            right: "-505px",
+                        },
+                    },
+                    {
+                        condition: "states['yeasir'] >= 4",
+                        style: {
+                            right: "25px",
+                        },
+                    },
+                ],
+                // conditionalRender: [
+                //     {
+                //         expression: "states['yeasir2'] === states['yeasir']", // First condition
+                //     },
+                //     {
+                //         operator: "OR", // Logical operator (OR, AND, NOT, NOR)
+                //         expression: "states['yeasir'] < 2", // Second condition
+                //     },
+                //     {
+                //         operator: "AND", // Logical operator (OR, AND, NOT, NOR)
+                //         expression: "states['yeasir3'] === 3", // Second condition
+                //     },
+                // ],
+            },
+            {
+                index: 1,
+                parentIndex: 5,
+                tag: "div",
+                style: {
+                    border: "1px solid",
+                    borderRadius: "50%",
+                    height: "50px",
+                    width: "50px",
+                },
+                conditionalStyles: [
+                    {
+                        condition: "states['yeasir'] < 4",
+                        style: {
+                            backgroundColor: "red",
+                        },
+                    },
+                    {
+                        condition: "states['yeasir'] >= 4",
+                        style: {
+                            backgroundColor: "green",
+                        },
+                    },
+                ],
             },
         ],
     },
