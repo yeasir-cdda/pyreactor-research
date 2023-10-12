@@ -41,11 +41,17 @@ export default function ClientSideRenderring({ Element, data, page }: ClientSide
         }));
     };
 
-    // !functions to run on page load
-    page?.functions?.forEach((func: string) => {
-        const hookFn = jsonToFunction(func, "func");
-        hookFn();
+    // !Functions management
+    const functionMap = {};
+    page?.functions?.forEach((func) => {
+        const wrappedFunction = jsonToFunction(func, "func");
+        functionMap[func.name] = wrappedFunction;
     });
+
+    //? call functions by function name
+    function callFunction(name) {
+        functionMap[name]();
+    }
 
     //! hooks to run on page load
     page?.hooks?.forEach((hook: { name: string; dependencies: Array<T>; hook: string }) => {

@@ -178,6 +178,8 @@ export const Pages = [
                 renderType: "csr",
             },
         ],
+
+        //?Here we can declare states like this
         states: [
             {
                 name: "yeasir",
@@ -194,18 +196,30 @@ export const Pages = [
         ],
         hooks: [
             {
+                //?react hook name like useEffect, useState, useReducer etc
+                //! you cant use custom hook here!!
                 name: "useEffect",
+                //? we can use our declared states here
                 dependencies: ["yeasir", "yeasir2"],
+                //? The main function that will execute when the dependencies change
                 hook: `function(){
                 console.log("hey there yeasir from hook")
             }`,
             },
         ],
+
         functions: [
             {
-                name: "setYeasir",
+                name: "cosoleHost",
                 func: `function() { 
                 console.log(window.location.host)
+
+            }`,
+            },
+            {
+                name: "giveAlert",
+                func: `function() { 
+                alert("hey there yeasir")
 
             }`,
             },
@@ -297,6 +311,7 @@ export const Pages = [
             {
                 index: 4,
                 tag: "button",
+                //? here we can add onClick function and we can update our states
                 onClick: `function(){
                     setStateValue("yeasir", states["yeasir"]+1)
                 }`,
@@ -321,8 +336,11 @@ export const Pages = [
             {
                 index: 6,
                 tag: "button",
+                // onClick: `function(){
+                //     setStateValue("yeasir", states["yeasir"]-1)
+                // }`,
                 onClick: `function(){
-                    setStateValue("yeasir", states["yeasir"]-1)
+                    callFunction("giveAlert")
                 }`,
                 style: {
                     marginTop: "5px",
@@ -345,8 +363,11 @@ export const Pages = [
             {
                 index: 8,
                 tag: "button",
+                // onClick: `function(){
+                //     setStateValue("yeasir3", states["yeasir3"]-1)
+                // }`,
                 onClick: `function(){
-                    setStateValue("yeasir3", states["yeasir3"]-1)
+                    callFunction("cosoleHost")
                 }`,
                 style: {
                     marginTop: "5px",
@@ -386,6 +407,7 @@ export const Pages = [
                     marginBottom: "10px",
                     transition: "all 0.5s ease-in-out",
                 },
+                //? we can conditionally set styles like this
                 conditionalStyles: [
                     {
                         condition: "states['yeasir'] < 4",
@@ -400,6 +422,9 @@ export const Pages = [
                         },
                     },
                 ],
+
+                //? we can conditionally render our components like this
+
                 // conditionalRender: [
                 //     {
                 //         expression: "states['yeasir2'] === states['yeasir']", // First condition
@@ -415,29 +440,57 @@ export const Pages = [
                 // ],
             },
             {
-                index: 1,
+                index: 9,
                 parentIndex: 5,
                 tag: "div",
                 style: {
                     border: "1px solid",
-                    borderRadius: "50%",
-                    height: "50px",
-                    width: "50px",
+                    weight: "100%",
+                    height: "100%",
+                    padding: "10px",
+                    display: "flex",
                 },
-                conditionalStyles: [
-                    {
-                        condition: "states['yeasir'] < 4",
-                        style: {
-                            backgroundColor: "red",
-                        },
-                    },
-                    {
-                        condition: "states['yeasir'] >= 4",
-                        style: {
-                            backgroundColor: "green",
-                        },
-                    },
-                ],
+                // conditionalStyles: [
+                //     {
+                //         condition: "states['yeasir'] < 4",
+                //         style: {
+                //             backgroundColor: "red",
+                //         },
+                //     },
+                //     {
+                //         condition: "states['yeasir'] >= 4",
+                //         style: {
+                //             backgroundColor: "green",
+                //         },
+                //     },
+                // ],
+            },
+            {
+                index: 10,
+                parentIndex: 9,
+                tag: "div",
+                style: {
+                    border: "1px solid",
+                    weight: "100%",
+                    height: "100%",
+                    padding: "10px",
+                    display: "flex",
+                    backgroundColor: "red",
+                },
+                // conditionalStyles: [
+                //     {
+                //         condition: "states['yeasir'] < 4",
+                //         style: {
+                //             backgroundColor: "red",
+                //         },
+                //     },
+                //     {
+                //         condition: "states['yeasir'] >= 4",
+                //         style: {
+                //             backgroundColor: "green",
+                //         },
+                //     },
+                // ],
             },
         ],
     },
