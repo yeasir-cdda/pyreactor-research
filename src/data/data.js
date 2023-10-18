@@ -313,7 +313,7 @@ export const Pages = [
                 tag: "button",
                 //? here we can add onClick function and we can update our states
                 onClick: `function(){
-                    setStateValue("yeasir", states["yeasir"]+1)
+                    setStateValue("yeasir", state["yeasir"]+1)
                 }`,
                 style: {
                     marginTop: "5px",
@@ -410,13 +410,13 @@ export const Pages = [
                 //? we can conditionally set styles like this
                 conditionalStyles: [
                     {
-                        condition: "states['yeasir'] < 4",
+                        condition: "state['yeasir'] < 4",
                         style: {
                             right: "-505px",
                         },
                     },
                     {
-                        condition: "states['yeasir'] >= 4",
+                        condition: "state['yeasir'] >= 4",
                         style: {
                             right: "25px",
                         },

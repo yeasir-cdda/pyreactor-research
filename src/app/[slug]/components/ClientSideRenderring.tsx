@@ -1,9 +1,10 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import jsonToFunction from "./jsToFnc";
+import GetState from "./mngState";
 const primaryColor = "#f3f3f3";
 type Obj = {
     [key: string]: any;
@@ -24,22 +25,7 @@ export default function ClientSideRenderring({ Element, data, page }: ClientSide
     const childDiv = Element.filter((el) => el.parentIndex).sort((a, b) => a.index - b.index);
 
     // !state management
-    //? Create an object to hold all the state values
-    const initialState: Obj = {};
-    //? Populate the initialState object based on the data
-    page?.states.forEach((item: { name: string; value: any }) => {
-        initialState[item.name] = item.value;
-    });
-    //?  initialize state
-    const [states, setState] = useState(initialState);
-
-    //?  function to update state values
-    const setStateValue = (name: string, newValue: any) => {
-        setState((prevState: Obj) => ({
-            ...prevState,
-            [name]: newValue,
-        }));
-    };
+    const [state, setStateValue] = GetState(page?.states);
 
     // !Functions management
     const functionMap = {};
@@ -58,7 +44,7 @@ export default function ClientSideRenderring({ Element, data, page }: ClientSide
         if (hook.name === "useEffect") {
             const dependencyArray: any[] = [];
             hook.dependencies.forEach((dependency: string) => {
-                dependencyArray.push(states[dependency]);
+                dependencyArray.push(state[dependency]);
             });
             useEffect(() => {
                 const hookFn = jsonToFunction(hook, "hook");
@@ -122,7 +108,7 @@ export default function ClientSideRenderring({ Element, data, page }: ClientSide
                                 onClick={pd.onClick && executeOnClickFunction}
                             >
                                 {/* parent - {pd.index} */}
-                                {pd.dataProperty && states[pd.dataProperty]}
+                                {pd.dataProperty && state[pd.dataProperty]}
                                 {childDiv.map((cd, i) => {
                                     // define child tag
 
@@ -195,7 +181,7 @@ export default function ClientSideRenderring({ Element, data, page }: ClientSide
                             onClick={pd.onClick && executeOnClickFunction}
                         >
                             {/* parent - {pd.index} */}
-                            {pd.dataProperty && states[pd.dataProperty]}
+                            {pd.dataProperty && state[pd.dataProperty]}
                             {childDiv.map((cd, i) => {
                                 // define child tag
 
